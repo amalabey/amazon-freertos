@@ -93,6 +93,54 @@ static void prvMiscInitialization( void );
     static void spp_uart_init( void );
 #endif
 
+#define clientcredentialWIFI_SSID    "Rainbow11"
+#define clientcredentialWIFI_PASSWORD   "codeblack12345"
+
+void connect_wifi();
+
+void connect_wifi()
+{
+    configPRINT(("Attempt to connect to wifi \n"));
+
+    WIFINetworkParams_t xNetworkParams;
+    WIFIReturnCode_t xWifiStatus;
+
+    xWifiStatus = WIFI_On(); // Turn on Wi-Fi module
+
+    // Check that Wi-Fi initialization was successful
+    if( xWifiStatus == eWiFiSuccess )
+    {
+        configPRINTF( ( "WiFi library initialized.\n") );
+    }
+    else
+    {
+        configPRINTF( ( "WiFi library failed to initialize.\n" ) );
+        // Handle module init failure
+
+    }
+
+    /* Setup parameters. */
+    xNetworkParams.pcSSID = clientcredentialWIFI_SSID;
+    xNetworkParams.ucSSIDLength = sizeof( clientcredentialWIFI_SSID );
+    xNetworkParams.pcPassword = clientcredentialWIFI_PASSWORD;
+    xNetworkParams.ucPasswordLength = sizeof( clientcredentialWIFI_PASSWORD );
+    xNetworkParams.xSecurity = eWiFiSecurityWPA2;
+
+    // Connect!
+    xWifiStatus = WIFI_ConnectAP( &( xNetworkParams ) );
+
+    if( xWifiStatus == eWiFiSuccess )
+    {
+        configPRINT( ( "WiFi Connected to AP.\n" ) );
+        // IP Stack will receive a network-up event on success
+    }
+    else
+    {
+        configPRINT( ( "WiFi failed to connect to AP.\n" ) );
+        // Handle connection failure
+    }
+}
+
 /*-----------------------------------------------------------*/
 
 /**
@@ -127,7 +175,7 @@ int app_main( void )
             ESP_ERROR_CHECK( esp_bt_controller_mem_release( ESP_BT_MODE_BLE ) );
         #endif /* if BLE_ENABLED */
         /* Run all demos. */
-        DEMO_RUNNER_RunDemos();
+        connect_wifi();
     }
 
     /* Start the scheduler.  Initialization that requires the OS to be running,
